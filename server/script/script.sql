@@ -1,0 +1,13 @@
+DROP DATABASE IF EXISTS favlinksAPI;
+CREATE DATABASE favlinksAPI;
+
+\c favlinksAPI;
+
+DROP TABLE IF EXISTS favlinks;
+
+
+CREATE TABLE favlinks (
+    id SERIAL NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    url VARCHAR(255) NOT NULL
+);

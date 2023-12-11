@@ -1,14 +1,50 @@
 const express = require('express');
 const path = require('path');
+const { Pool } = require('pg');
 const PORT = 3000;
 const app = express();
+
+const pool = require('pg');
+
+pool = new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'favlinksAPI',
+    password: 'root',
+    port: 5472,
+})
 
 const clientPath = path.resolve(__dirname, '../client/favlinks/dist');
 
 app.use(express.static(clientPath));
+app.use(express.json());
 
 app.get("/", (req, res) => {
     res.sendFile(path.resolve("../client/favlinks/dist", "index.html"))
+})
+
+app.get("/api/favlinks", (req, res) => {
+    pool.Query(`SELECT * FROM favlinks`, (error, result) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send('Internal Server Error');
+        } else {
+            res.status(200).json(result);
+        }
+    })
+})
+
+app.post("/api/favlinks/new", (req, res) => {
+    const { title, link } = req.body;
+
+    pool.Query(`INSERT INTO favlinksAPI (name, link) VALUES ($1, $2)`, [title, link], (error, result) => {
+        if (error) {
+            console.log(error)
+            res.status(500).send('Internal Server Error');
+        } else {
+            res.status(204).json("Created new link");
+        }
+    })
 })
 
 app.listen(PORT, () => {
